@@ -3,12 +3,16 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from fredapi import Fred
 from scipy.stats import pearsonr
+from dotenv import load_dotenv
+import os
 
 START_DATE = "2018-01-01"
 END_DATE = "2025-11-01"
 FRED_API_KEY = "FRED_API_KEY_HERE"   
 
 # fetching inflation data from fred inflation 
+load_dotenv()
+FRED_API_KEY = os.getenv("FRED_API_KEY")
 fred = Fred(api_key=FRED_API_KEY)
 
 # CPI inflatiion rate over the years (% change)
