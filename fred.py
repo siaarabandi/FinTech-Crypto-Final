@@ -8,7 +8,6 @@ import os
 
 START_DATE = "2018-01-01"
 END_DATE = "2025-11-01"
-FRED_API_KEY = "FRED_API_KEY_HERE"   
 
 # fetching inflation data from fred inflation 
 load_dotenv()
@@ -76,8 +75,10 @@ plt.tight_layout()
 plt.show()
 
 # inflation vs. crypto+equity correlation
-btc_sp_corr = returns["BTC-USD"].rolling(12).corr(returns["^GSPC"])  
+btc_sp_corr = returns["BTC-USD"].rolling(12).corr(returns["^GSPC"])
+btc_sp_corr.name = "BTC–S&P500 Correlation"  
 merged_corr = pd.concat([btc_sp_corr, inflation["Inflation (%)"]], axis=1).dropna()
+
 
 fig, ax1 = plt.subplots(figsize=(10,5))
 ax1.plot(merged_corr.index, merged_corr["BTC-USD"], color="orange", label="BTC–S&P500 Correlation")
