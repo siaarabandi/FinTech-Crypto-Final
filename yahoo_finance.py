@@ -9,27 +9,21 @@ START_DATE = "2018-01-01"
 END_DATE = "2025-11-01"
 ROLLING_WINDOW = 365  
 
-# # fetching data from yahoo finance
-# tickers = ["BTC-USD", "ETH-USD", "^GSPC"]  
-# data = yf.download(tickers, start=START_DATE, end=END_DATE)["Close"]
-# data = data.dropna()
-# data.head()
-
 
 CACHE_FILE = "yfinance_data.csv"  
 TICKERS = ["BTC-USD", "ETH-USD", "^GSPC"]
 
 # if local file exists, load it
 if os.path.exists(CACHE_FILE):
-    print("📂 Loading data from local cache...")
+    print("Loading data from local cache...")
     data = pd.read_csv(CACHE_FILE, index_col=0, parse_dates=True)
 else:
-    print("🌐 Downloading data from Yahoo Finance...")
+    print("Downloading data from Yahoo Finance...")
     data = yf.download(TICKERS, start=START_DATE, end=END_DATE)["Close"]
     data = data.dropna()
     # save to CSV for next time
     data.to_csv(CACHE_FILE)
-    print("✅ Data saved to", CACHE_FILE)
+    print("Data saved to", CACHE_FILE)
 
 
 print(data.head())
@@ -146,5 +140,5 @@ print(pd.DataFrame({
 }).round(3))
 
 corr_df.to_csv("rolling_correlation.csv")
-print("📁 Saved rolling_correlation.csv")
+print("Saved rolling_correlation.csv")
 
