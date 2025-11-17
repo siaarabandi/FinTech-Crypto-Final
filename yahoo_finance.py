@@ -4,27 +4,24 @@ import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
 import os
 
-
 START_DATE = "2018-01-01"
 END_DATE = "2025-11-01"
 ROLLING_WINDOW = 365  
 
-
 CACHE_FILE = "yfinance_data.csv"  
 TICKERS = ["BTC-USD", "ETH-USD", "^GSPC"]
 
-# if local file exists, load it
+# used caching to store yahoo finance data locally
+# did this to fix "exceeding yfinance api requests allowance" error
 if os.path.exists(CACHE_FILE):
-    print("Loading data from local cache...")
+    print("Loading data from local cache")
     data = pd.read_csv(CACHE_FILE, index_col=0, parse_dates=True)
 else:
-    print("Downloading data from Yahoo Finance...")
+    print("Downloading data from Yahoo Finance")
     data = yf.download(TICKERS, start=START_DATE, end=END_DATE)["Close"]
     data = data.dropna()
-    # save to CSV for next time
     data.to_csv(CACHE_FILE)
     print("Data saved to", CACHE_FILE)
-
 
 print(data.head())
 
@@ -44,8 +41,10 @@ corr_df = pd.DataFrame({
 }).dropna()
 
 # statistical test of correlations past vs. present 
-early_period = corr_df.loc["2018":"2021"]
-late_period = corr_df.loc["2022":"2025"]
+# 2018-2020: pre-institutional era
+# 2021 - 2025: institutional ownership of crypto era
+early_period = corr_df.loc["2018":"2020"]
+late_period = corr_df.loc["2021":"2025"]
 
 t_stat_btc, p_btc = ttest_ind(
     early_period["BTC-S&P500"].dropna(),
@@ -58,6 +57,7 @@ t_stat_eth, p_eth = ttest_ind(
     equal_var=False
 )
 
+# t-test results printed here
 print(" Statistical Test Results (Independent Two Sample t-Test): ")
 print(f"BTC-S&P500: p-value = {p_btc:.4f}")
 print(f"ETH-S&P500: p-value = {p_eth:.4f}")
@@ -66,7 +66,8 @@ if p_btc < 0.05 or p_eth < 0.05:
 else:
     print("No statistically significant increase in correlation.")
 
-# visualizations
+
+# visualizations code below
 plt.style.use("seaborn-v0_8-whitegrid")
 
 # normalized price trends
@@ -83,7 +84,6 @@ plt.show()
 
 
 # dual axis market price trends
-
 fig, ax1 = plt.subplots(figsize=(12,6))
 
 ax1.plot(data.index, data["^GSPC"], color="purple", label="S&P 500 Price")
@@ -100,7 +100,7 @@ fig.tight_layout()
 plt.show()
 
 
-# rolling correlations
+# rolling correlations line graph (BTC + S&P500 & ETH + S&P500)
 plt.figure(figsize=(10,5))
 plt.plot(corr_df.index, corr_df["BTC-S&P500"], label="BTC–S&P500", color="orange")
 plt.plot(corr_df.index, corr_df["ETH-S&P500"], label="ETH–S&P500", color="blue")
@@ -113,7 +113,7 @@ plt.tight_layout()
 plt.show()
 
 # boxplot of correlations before vs after 2021 
-period_labels = ["2018–2021", "2022–2025"]
+period_labels = ["2018–2020", "2021–2025"]
 btc_data = [early_period["BTC-S&P500"], late_period["BTC-S&P500"]]
 eth_data = [early_period["ETH-S&P500"], late_period["ETH-S&P500"]]
 
@@ -135,10 +135,9 @@ avg_corr_early = early_period.mean()
 avg_corr_late = late_period.mean()
 print("\n Average Rolling Correlations")
 print(pd.DataFrame({
-    "2018–2021": avg_corr_early,
-    "2022–2025": avg_corr_late
+    "2018–2020": avg_corr_early,
+    "2021–2025": avg_corr_late
 }).round(3))
 
+# saving to csv to transfer this data to crypto_holdings.py
 corr_df.to_csv("rolling_correlation.csv")
-print("Saved rolling_correlation.csv")
-
