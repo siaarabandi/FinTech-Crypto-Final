@@ -89,12 +89,6 @@ plt.legend(loc="upper left")
 plt.tight_layout()
 plt.show()
 
-#summary
-summary = pd.DataFrame({
-    "Asset": ["Bitcoin", "Ethereum", "S&P 500"],
-    "Correlation with Inflation": [corr_btc, corr_eth, corr_sp],
-    "p-value": [p_btc, p_eth, p_sp]
-})
 
-print("\n=== Summary ===")
-print(summary.round(3))
+
+
